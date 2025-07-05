@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PowerSim - Policy Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 55%, #fad0c4 100%, #a18cd1 100%);
+      background-size: cover;
+      background-attachment: fixed;
+      color: #333;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      max-width: 750px;
+      margin: auto;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    h1 {
+      color: #d946ef;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    label {
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+    textarea, select, input {
+      display: block;
+      width: 100%;
+      margin: 0.5rem 0 1rem 0;
+      padding: 0.8rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      box-sizing: border-box;
+    }
+    button {
+      background: linear-gradient(to right, #ff758c, #ff7eb3);
+      color: white;
+      padding: 0.9rem;
+      border: none;
+      font-weight: 600;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      transform: scale(1.03);
+      background: linear-gradient(to right, #ff6a88, #ff99ac);
+    }
+    .result, .rating, .debate {
+      background: #fceff9;
+      padding: 1.2rem;
+      margin-top: 2rem;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      line-height: 1.5;
+      border-left: 5px solid #e879f9;
+    }
+    .debate {
+      background: #fff3cd;
+      border-left: 5px solid #f0ad4e;
+    }
+    .engage-tip {
+      background: #f3d8ff;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-top: 2rem;
+      font-size: 0.95rem;
+      font-style: italic;
+      color: #6b21a8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>👩‍⚖️ PowerSim: Draft Your Vibe-worthy Law</h1>
+
+    <label for="policy">✨ Pick a Policy Category:</label>
+    <select id="policy">
+      <option>FINANCE</option>
+      <option>CLIMATE ACTION</option>
+      <option>WOMENS RIGHTS</option>
+      <option>EDUCATION</option>
+      <option>CORRUPTION</option>
+      <option>CASTE</option>
+      <option>HEALTH</option>
+      <option>RELIGIOUS MINORITIES</option>
+      <option>POVERTY</option>
+    </select>
+
+    <label for="title">📝 Bill Title:</label>
+    <input type="text" id="title" placeholder="E.g., The Justice Booster Act 💥">
+
+    <label for="clause1">Clause 1:</label>
+    <textarea id="clause1" placeholder="Drop your first 🔥 policy idea..."></textarea>
+
+    <label for="clause2">Clause 2:</label>
+    <textarea id="clause2" placeholder="Make it bold, make it impactful! 🌟"></textarea>
+
+    <label for="clause3">Clause 3:</label>
+    <textarea id="clause3" placeholder="One last punchline for the democracy squad 🇮🇳"></textarea>
+
+    <button onclick="simulatePolicy()">🚀 Simulate My Bill</button>
+
+    <div id="rating" class="rating" style="display: none;"></div>
+    <div id="debate" class="debate" style="display: none;"></div>
+
+    <div class="engage-tip">
+      💡 Pro tip: Share your passed bills with your squad. Be the GenZ changemaker. PowerSim = Policy with ✨aesthetic + activism✨.
+    </div>
+  </div>
+
+  <script>
+    async function simulatePolicy() {
+      const title = document.getElementById('title').value.trim();
+      const clause1 = document.getElementById('clause1').value.trim();
+      const clause2 = document.getElementById('clause2').value.trim();
+      const clause3 = document.getElementById('clause3').value.trim();
+      const category = document.getElementById('policy').value;
+
+      if (!title || !clause1 || !clause2 || !clause3) {
+        alert("Bruh, complete your bill before simulating it 💀");
+        return;
+      }
+
+      try {
+        const res = await fetch('http://localhost:3000/api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, clause1, clause2, clause3, category })
+        });
+
+        if (!res.ok) {
+          throw new Error(`Server error: ${res.status}`);
+        }
+
+        const { rating, support, pro, con, opposition } = await res.json();
+
+        document.getElementById('rating').style.display = 'block';
+        document.getElementById('rating').innerHTML =
+          `🧠 Power Rating: ${rating}/10<br>📊 Netizen Support: ${support}%<br><br>` +
+          `<u>Why this score?</u><br>✅ Pro: ${pro}<br>⚠️ Con: ${con}`;
+
+        document.getElementById('debate').style.display = 'block';
+        document.getElementById('debate').innerHTML =
+          `🎙️ <strong>Opposition Responds:</strong><br>${opposition}`;
+
+      } catch (err) {
+        console.error("❌ Error simulating bill:", err);
+        alert("Something went wrong while simulating your bill 😢\nCheck if your backend is running.");
+      }
+    }
+  </script>
+</body>
+</html>
